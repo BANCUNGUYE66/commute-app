@@ -1,6 +1,6 @@
-# 🗺️ Commute Comparator (Geo-Political Data Edition)
+# 🗺️ Commute-app (Geo-Political Data Edition)
 
-The **Commute Comparator** application (renamed for repository consistency) is a high-value research tool designed for comparative political and resource analysis. It allows users to input two countries and instantly compares key structural, demographic, and economic metrics (Population, Density, Language, etc.).
+The **Commute-app** application (renamed for repository consistency) is a high-value research tool designed for comparative political and resource analysis. It allows users to input two countries and instantly compares key structural, demographic, and economic metrics (Population, Density, Language, etc.).
 
 This application goes beyond simple data display by calculating derived metrics (Population Density) and utilizing two external APIs to ensure robust data integrity and meet all assignment compliance requirements.
 
