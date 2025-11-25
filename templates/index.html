@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commute Comparator</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f7f6; color: #333; }
+        h1 { text-align: center; color: #2c3e50; }
+        .search-box { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #c0392b; }
+        .error { background-color: #ff7675; color: white; padding: 10px; border-radius: 5px; margin-top: 20px; text-align: center; }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px; }
+        .card { background: white; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 5px solid #ccc; }
+        .Driving { border-top-color: #3498db; } .Walking { border-top-color: #2ecc71; } .Cycling { border-top-color: #f1c40f; }
+        .time { font-size: 2em; font-weight: bold; color: #2c3e50; }
+        .dist { color: #7f8c8d; }
+    </style>
+</head>
+<body>
+    <h1>🗺️ Commute Comparator</h1>
+    <div class="search-box">
+        <form method="POST">
+            <label>Start</label><input type="text" name="origin" placeholder="e.g. Berlin" value="{{ origin }}" required>
+            <label>Destination</label><input type="text" name="destination" placeholder="e.g. Munich" value="{{ dest }}" required>
+            <button type="submit">Compare Routes</button>
+        </form>
+    </div>
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+    <div class="results-grid">
+        {% for route in routes %}
+        <div class="card {{ route.mode }}">
+            <h3>{{ route.mode }}</h3>
+            <div class="time">{{ route.duration }}</div>
+            <div class="dist">{{ route.distance }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
