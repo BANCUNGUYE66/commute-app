@@ -6,6 +6,13 @@ This application goes beyond simple data display by calculating derived metrics 
 
 ---
 
+
+##🎬 Demo Video Link
+
+[Video](https://www.loom.com/share/6ed5cde0dff242f89717cba96df04b18).
+
+---
+
 ## 🚀 Features
 
 * **High-Value Metrics:** Compares Population, Area, Capital, Language, and calculated Population Density.
