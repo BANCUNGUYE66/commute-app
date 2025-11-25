@@ -89,7 +89,7 @@ For security, API keys are not stored in the code. You must create a `.env` file
 1. Create a file named `.env`.
 2. Add your Geoapify API key in the following format (using the valid key):
 ```text
-GEOAPIFY_API_KEY=df009df00d84484ba8888b56e4db7845
+GEOAPIFY_API_KEY=your_actual_api_key_here
 ```
 
 **Step 5: Run the Application**
