@@ -37,8 +37,8 @@ def get_country_data(country_name):
         area = data.get('area', 0)
         
         # --- 2. Fetch Secondary Data (Geoapify - Requires Key) ---
-        # Geoapify must be called and requires the key (for compliance)
-        flag_emoji = "❓"
+        flag_url = "https://flagcdn.com/w40/us.png" # Default to US flag
+        
         if GEOAPIFY_KEY:
             # We call Geoapify just to fulfill the API key requirement and get the ISO code
             params = {"apiKey": GEOAPIFY_KEY, "text": country_name, "limit": 1}
@@ -46,10 +46,11 @@ def get_country_data(country_name):
             geo_data = geo_response.json()
             
             if geo_data.get('features'):
+                # We use the country code from Geoapify to build the FlagCDN URL
                 country_code = geo_data['features'][0]['properties'].get('country_code', '').lower()
                 if len(country_code) == 2:
-                    # Convert ISO code (e.g., fr) to Flag Emoji (🇫🇷)
-                    flag_emoji = chr(ord(country_code[0]) - 0x20 + 0x1F1E6) + chr(ord(country_code[1]) - 0x20 + 0x1F1E6)
+                    # FIX: Use FlagCDN URL which is reliable in all browsers
+                    flag_url = f"https://flagcdn.com/w40/{country_code}.png"
         
         # --- 3. Compile final structural data ---
         return {
@@ -60,9 +61,10 @@ def get_country_data(country_name):
             "language": list(data.get("languages", {}).values())[0] if data.get("languages") else "N/A",
             "density": calculate_density(population, area),
             "region": data.get("region", "N/A"),
-            "flag": flag_emoji
+            "flag": flag_url # Now returns a valid image URL
         }
-    except Exception:
+    except Exception as e:
+        # print(f"General error: {e}") # Debugging line
         return None
 
 @app.route('/', methods=['GET', 'POST'])

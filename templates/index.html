@@ -1,119 +1,109 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geo-Political Data Analyst</title>
-    <style>
-        body { font-family: sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background-color: #f0f8ff; }
-        h1 { text-align: center; color: #3498db; margin-bottom: 5px; }
-        h2 { text-align: center; color: #555; font-size: 1.2em; margin-bottom: 25px; }
-        .search-box { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; gap: 20px; justify-content: center; margin-bottom: 30px; }
-        input { padding: 12px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; flex: 1; min-width: 200px; }
-        button { padding: 12px 30px; background-color: #2ecc71; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
-        button:hover { background-color: #28a745; }
-        .error { background-color: #e74c3c; color: white; padding: 15px; border-radius: 5px; margin-top: 20px; text-align: center; }
-        
-        .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
-        .card { 
-            background: white; 
-            padding: 25px; 
-            border-radius: 10px; 
-            box-shadow: 0 0 15px rgba(0,0,0,0.1); 
-            border-top: 5px solid #3498db;
-        }
-        .card h3 { 
-            margin-top: 0; 
-            font-size: 1.8em; 
-            text-align: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
-        .metric { margin: 15px 0; font-size: 1.1em; border-bottom: 1px solid #f2f2f2; padding-bottom: 8px;}
-        .label { font-weight: bold; color: #6c757d; width: 60%; display: inline-block; }
-        .value { float: right; font-weight: 600; color: #333; }
-        .flag { font-size: 2em; margin-right: 10px; }
-        .density { color: #e74c3c; font-weight: 800; }
-    </style>
-</head>
-<body>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Geo-Political Data Analyst</title><style>body { font-family: sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background-color: #f0f8ff; }h1 { text-align: center; color: #3498db; margin-bottom: 5px; }h2 { text-align: center; color: #555; font-size: 1.2em; margin-bottom: 25px; }.search-box { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; gap: 20px; justify-content: center; margin-bottom: 30px; }input { padding: 12px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; flex: 1; min-width: 200px; }button { padding: 12px 30px; background-color: #2ecc71; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }button:hover { background-color: #28a745; }.error { background-color: #e74c3c; color: white; padding: 15px; border-radius: 5px; margin-top: 20px; text-align: center; }    .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
+    .card { 
+        background: white; 
+        padding: 25px; 
+        border-radius: 10px; 
+        box-shadow: 0 0 15px rgba(0,0,0,0.1); 
+        border-top: 5px solid #3498db;
+    }
+    .card h3 { 
+        margin-top: 0; 
+        font-size: 1.5em; 
+        text-align: center;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+        display: flex; /* Flex container for flag image/text alignment */
+        align-items: center;
+        justify-content: center;
+    }
+    .metric { margin: 15px 0; font-size: 1.1em; border-bottom: 1px solid #f2f2f2; padding-bottom: 8px;}
+    .label { font-weight: bold; color: #6c757d; width: 60%; display: inline-block; }
+    .value { float: right; font-weight: 600; color: #333; }
+    
+    /* Flag Image Styling */
+    .flag-image { 
+        width: 32px; 
+        height: 24px; 
+        margin-right: 10px; 
+        border: 1px solid #ccc;
+    }
+    
+    .density { color: #e74c3c; font-weight: 800; }
+</style>
+</head><body><h1>🏛️ Geo-Political Data Analyst</h1>
+<h2>Compare key metrics for governance, trade, and resource planning.</h2>
 
-    <h1>🏛️ Geo-Political Data Analyst</h1>
-    <h2>Compare key metrics for governance, trade, and resource planning.</h2>
+<div class="search-box">
+    <form method="POST" style="display:flex; gap: 10px; width: 100%; max-width: 700px;">
+        <input type="text" name="country1" placeholder="Country 1 (e.g., Rwanda)" required>
+        <input type="text" name="country2" placeholder="Country 2 (e.g., France)" required>
+        <button type="submit">Compare Metrics</button>
+    </form>
+</div>
 
-    <div class="search-box">
-        <form method="POST" style="display:flex; gap: 10px; width: 100%; max-width: 700px;">
-            <input type="text" name="country1" placeholder="Country 1 (e.g., Rwanda)" required>
-            <input type="text" name="country2" placeholder="Country 2 (e.g., France)" required>
-            <button type="submit">Compare Metrics</button>
-        </form>
-    </div>
+{% if error %}
+    <div class="error">{{ error }}</div>
+{% endif %}
 
-    {% if error %}
-        <div class="error">{{ error }}</div>
-    {% endif %}
-
-    {% if country1 and country2 %}
-    <div class="comparison-grid">
-        <!-- Card 1 -->
-        <div class="card">
-            <h3><span class="flag">{{ country1.flag }}</span> {{ country1.name }}</h3>
-            <div class="metric">
-                <span class="label">Population:</span>
-                <span class="value">{{ country1.population }}</span>
-            </div>
-            <div class="metric">
-                <span class="label">Area (sq km):</span>
-                <span class="value">{{ country1.area }}</span>
-            </div>
-            <div class="metric">
-                <span class="label">**Pop. Density (p/km²):**</span>
-                <span class="value density">{{ country1.density }}</span>
-            </div>
-            <div class="metric">
-                <span class="label">Capital:</span>
-                <span class="value">{{ country1.capital }}</span>
-            </div>
-            <div class="metric">
-                <span class="label">Official Language:</span>
-                <span class="value">{{ country1.language }}</span>
-            </div>
-            <div class="metric">
-                <span class="label">Region:</span>
-                <span class="value">{{ country1.region }}</span>
-            </div>
+{% if country1 and country2 %}
+<div class="comparison-grid">
+    <!-- Card 1 -->
+    <div class="card">
+        <h3><img src="{{ country1.flag }}" class="flag-image" alt="{{ country1.name }} Flag"> {{ country1.name }}</h3>
+        <div class="metric">
+            <span class="label">Population:</span>
+            <span class="value">{{ country1.population }}</span>
         </div>
-        
-        <!-- Card 2 -->
-        <div class="card">
-            <h3><span class="flag">{{ country2.flag }}</span> {{ country2.name }}</h3>
-            <div class="metric">
-                <span class="label">Population:</span>
-                <span class="value">{{ country2.population }}</span>
-            </div>
-            <div class="metric">
-                <span class="label">Area (sq km):</span>
-                <span class="value">{{ country2.area }}</span>
-            </div>
-            <div class="metric">
-                <span class="label">**Pop. Density (p/km²):**</span>
-                <span class="value density">{{ country2.density }}</span>
-            </div>
-            <div class="metric">
-                <span class="label">Capital:</span>
-                <span class="value">{{ country2.capital }}</span>
-            </div>
-            <div class="metric">
-                <span class="label">Official Language:</span>
-                <span class="value">{{ country2.language }}</span>
-            </div>
-            <div class="metric">
-                <span class="label">Region:</span>
-                <span class="value">{{ country2.region }}</span>
-            </div>
+        <div class="metric">
+            <span class="label">Area (sq km):</span>
+            <span class="value">{{ country1.area }}</span>
+        </div>
+        <div class="metric">
+            <span class="label">**Pop. Density (p/km²):**</span>
+            <span class="value density">{{ country1.density }}</span>
+        </div>
+        <div class="metric">
+            <span class="label">Capital:</span>
+            <span class="value">{{ country1.capital }}</span>
+        </div>
+        <div class="metric">
+            <span class="label">Official Language:</span>
+            <span class="value">{{ country1.language }}</span>
+        </div>
+        <div class="metric">
+            <span class="label">Region:</span>
+            <span class="value">{{ country1.region }}</span>
         </div>
     </div>
-    {% endif %}
-
-</body>
-</html>
+    
+    <!-- Card 2 -->
+    <div class="card">
+        <h3><img src="{{ country2.flag }}" class="flag-image" alt="{{ country2.name }} Flag"> {{ country2.name }}</h3>
+        <div class="metric">
+            <span class="label">Population:</span>
+            <span class="value">{{ country2.population }}</span>
+        </div>
+        <div class="metric">
+            <span class="label">Area (sq km):</span>
+            <span class="value">{{ country2.area }}</span>
+        </div>
+        <div class="metric">
+            <span class="label">**Pop. Density (p/km²):**</span>
+            <span class="value density">{{ country2.density }}</span>
+        </div>
+        <div class="metric">
+            <span class="label">Capital:</span>
+            <span class="value">{{ country2.capital }}</span>
+        </div>
+        <div class="metric">
+            <span class="label">Official Language:</span>
+            <span class="value">{{ country2.language }}</span>
+        </div>
+        <div class="metric">
+            <span class="label">Region:</span>
+            <span class="value">{{ country2.region }}</span>
+        </div>
+    </div>
+</div>
+{% endif %}
+</body></html>
