@@ -35,7 +35,7 @@ This application goes beyond simple data display by calculating derived metrics 
 
 This application uses two APIs to ensure robustness and compliance with the key requirement.
 
-1. **REST Countries API** (Primary Data, No Key Needed):
+1. **REST Countries API** (Primary Data):
 
    * **Endpoint:** `https://restcountries.com/v3.1/name/{country}`
 
