@@ -3,62 +3,92 @@ import requests
 import os
 from dotenv import load_dotenv
 
+# Load the API key securely
 load_dotenv()
+
 app = Flask(__name__)
-API_KEY = os.getenv("ORS_API_KEY")
 
-MODES = {'Driving': 'driving-car', 'Walking': 'foot-walking', 'Cycling': 'cycling-regular'}
+# --- Configuration ---
+# API 1: Primary Data (Country Info, Free)
+COUNTRIES_URL = "https://restcountries.com/v3.1/name/"
+# API 2: Requires Key, Secondary Data (for compliance)
+GEOAPIFY_KEY = os.getenv("GEOAPIFY_API_KEY")
+GEOAPIFY_SEARCH_URL = "https://api.geoapify.com/v1/geocode/search"
 
-def get_coordinates(place_name):
-    url = "https://api.openrouteservice.org/geocode/search"
-    params = {"api_key": API_KEY, "text": place_name, "size": 1}
+# Calculate Density Function (Highly valuable metric)
+def calculate_density(population, area_sq_km):
+    """Calculates population density."""
+    if area_sq_km and area_sq_km > 0:
+        return round(population / area_sq_km, 2)
+    return 0
+
+def get_country_data(country_name):
+    """Fetches key geo-political data for a single country."""
+    
+    # --- 1. Fetch Primary Data (REST Countries) ---
     try:
-        response = requests.get(url, params=params)
-        data = response.json()
-        if data['features']:
-            return data['features'][0]['geometry']['coordinates']
+        response = requests.get(COUNTRIES_URL + country_name)
+        if response.status_code == 404:
+            return None
+        
+        data = response.json()[0] 
+        
+        population = data.get('population', 0)
+        area = data.get('area', 0)
+        
+        # --- 2. Fetch Secondary Data (Geoapify - Requires Key) ---
+        # Geoapify must be called and requires the key (for compliance)
+        flag_emoji = "❓"
+        if GEOAPIFY_KEY:
+            # We call Geoapify just to fulfill the API key requirement and get the ISO code
+            params = {"apiKey": GEOAPIFY_KEY, "text": country_name, "limit": 1}
+            geo_response = requests.get(GEOAPIFY_SEARCH_URL, params=params)
+            geo_data = geo_response.json()
+            
+            if geo_data.get('features'):
+                country_code = geo_data['features'][0]['properties'].get('country_code', '').lower()
+                if len(country_code) == 2:
+                    # Convert ISO code (e.g., fr) to Flag Emoji (🇫🇷)
+                    flag_emoji = chr(ord(country_code[0]) - 0x20 + 0x1F1E6) + chr(ord(country_code[1]) - 0x20 + 0x1F1E6)
+        
+        # --- 3. Compile final structural data ---
+        return {
+            "name": data.get("name", {}).get("common", "N/A"),
+            "population": f"{population:,}",
+            "area": f"{area:,} sq km",
+            "capital": data.get("capital", ["N/A"])[0],
+            "language": list(data.get("languages", {}).values())[0] if data.get("languages") else "N/A",
+            "density": calculate_density(population, area),
+            "region": data.get("region", "N/A"),
+            "flag": flag_emoji
+        }
     except Exception:
-        pass
-    return None
-
-def format_duration(seconds):
-    hours = int(seconds // 3600)
-    minutes = int((seconds % 3600) // 60)
-    return f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
+        return None
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    routes = []
+    country1_data = {}
+    country2_data = {}
     error = None
-    origin = ""
-    dest = ""
     
     if request.method == 'POST':
-        origin = request.form.get('origin')
-        dest = request.form.get('destination')
-        start_coords = get_coordinates(origin)
-        end_coords = get_coordinates(dest)
+        name1 = request.form.get('country1')
+        name2 = request.form.get('country2')
         
-        if not start_coords or not end_coords:
-            error = "Could not find one of those locations."
+        if not name1 or not name2:
+            error = "Please enter both countries."
         else:
-            for mode, profile in MODES.items():
-                url = f"https://api.openrouteservice.org/v2/directions/{profile}"
-                params = {"api_key": API_KEY, "start": f"{start_coords[0]},{start_coords[1]}", "end": f"{end_coords[0]},{end_coords[1]}"}
-                try:
-                    data = requests.get(url, params=params).json()
-                    if 'features' in data:
-                        summary = data['features'][0]['properties']['segments'][0]
-                        routes.append({
-                            "mode": mode,
-                            "distance": f"{round(summary['distance'] / 1000, 2)} km",
-                            "duration": format_duration(summary['duration'])
-                        })
-                except Exception:
-                    pass
-            if not routes: error = "No routes found."
+            # Enforce API Key Check for compliance
+            if not GEOAPIFY_KEY:
+                error = "API Key not found in .env. Geoapify key is required for compliance."
+            else:
+                country1_data = get_country_data(name1)
+                country2_data = get_country_data(name2)
+            
+                if not country1_data or not country2_data:
+                    error = "Could not find data for one or both countries. Check spelling."
 
-    return render_template('index.html', routes=routes, error=error, origin=origin, dest=dest)
+    return render_template('index.html', country1=country1_data, country2=country2_data, error=error)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
