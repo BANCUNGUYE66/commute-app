@@ -137,4 +137,7 @@ During the development of this application, several technical challenges were en
 
 ## 📜 Credits & Acknowledgments
 
+* **Primary Data:** [REST Countries API](https://restcountries.com/).
+* **Secondary Data/Geocoding:** [Geoapify](https://www.geoapify.com/).
 * **Framework:** [Flask](https://flask.palletsprojects.com/).
+
